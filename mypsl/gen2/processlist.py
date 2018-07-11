@@ -179,7 +179,7 @@ class ProcessList():
 
         print(op.show_processing_time(self.start_time, time.time()))
 
-        print()
+        print
 
         return True
 

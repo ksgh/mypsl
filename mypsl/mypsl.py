@@ -40,12 +40,7 @@ try:
 except ImportError:
     HAS_ARGCOMPLETE = False
 
-PROCESS_THRESHOLD_WARN  = 100
-PROCESS_THRESHOLD_CRIT  = 200
-SLEEPER_THRESHOLD_WARN  = 30
-SLEEPER_THRESHOLD_CRIT  = 75
 INFO_TRIM_LENGTH        = 1000
-
 
 '''
 The following directory should contain files that should be in yaml format
@@ -248,7 +243,7 @@ def main():
         try:
             while True:
                 counter += 1
-                if pl.process_row():
+                if pl.process_row(counter):
                     counter = 0
                 time.sleep(args.loop_second_interval)
                 pl.update(time.time())

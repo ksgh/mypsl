@@ -121,6 +121,7 @@ class ProcessNode(Node):
 
         return self
 
+
     def run(self):
         sleep = 5
 
@@ -135,6 +136,4 @@ class ProcessNode(Node):
 
         self.num_processes = cur.rowcount
         return res
-
-
 
