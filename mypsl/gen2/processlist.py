@@ -217,6 +217,8 @@ class ProcessList():
                 return
 
     def murdah(self):
+        # neutered... for now.
+        return
         ## ok. is it an integer and are the connected threads greater than the kill threshold ?
         try:
             kill_threshold = int(self.config.get('kill_threshold'))
