@@ -4,13 +4,9 @@ import os
 import time
 import outputter as op
 
-
-OUT_FORMAT      = "{0:<12}{1:16}{2:20}{3:22}{4:25}{5:<8}{6:28}{7:25}"
-
 READ_SEARCH     = ('show', 'select', 'desc')
 WRITE_SEARCH    = ('insert', 'update', 'create', 'alter', 'replace', 'rename', 'delete')
 LOCKED_SEARCH   = ('locked', 'waiting for table level lock', 'waiting for table metadata lock')
-LONG_QUERY_TIME = 0
 
 PROCESS_THRESHOLD_WARN  = 100
 PROCESS_THRESHOLD_CRIT  = 200
@@ -18,26 +14,15 @@ SLEEPER_THRESHOLD_WARN  = 30
 SLEEPER_THRESHOLD_CRIT  = 75
 INFO_TRIM_LENGTH        = 1000
 
-
-def show_processing_time(start, end, text='Processing time'):
-    elapsed = round(end - start, 3)
-
-    if elapsed > 5:
-        elapsed_str = op.cv(elapsed, op.Fore.RED)
-    elif elapsed > .5:
-        elapsed_str = op.cv(elapsed, op.Fore.YELLOW)
-    else:
-        elapsed_str = op.cv(elapsed, op.Fore.CYAN)
-
-    print("\t({0}): {1}".format(op.cv(text, op.Fore.GREEN), elapsed_str))
-
 class ProcessList():
 
     def __init__(self, process_node, config):
         self.process_node = process_node
+        self.start_time = time.time()
         self.config = config
 
-    def update(self):
+    def update(self, start_time):
+        self.start_time = start_time
         self.process_node = self.process_node.update()
 
         return self
@@ -59,7 +44,7 @@ class ProcessList():
 
         print(header)
         print("{0}".format(op.Style.BRIGHT) +
-              OUT_FORMAT.format("ID", "USER", "HOST", "DB", "COMMAND", "TIME", "STATE", "INFO") +
+              op.OUT_FORMAT.format("ID", "USER", "HOST", "DB", "COMMAND", "TIME", "STATE", "INFO") +
               "{0}".format(op.Style.RESET_ALL))
 
 
@@ -105,7 +90,7 @@ class ProcessList():
             if int(row['time']) > self.process_node.long_query_time: num_past_long_query += 1
 
             print \
-                (OUT_FORMAT.format(row['id'], row['user'], row['host'], row['db'], row['command'], row['time'], row['state'], row['info'].encode('utf-8')))
+                (op.OUT_FORMAT.format(row['id'], row['user'], row['host'], row['db'], row['command'], row['time'], row['state'], row['info'].encode('utf-8')))
 
         if self.config.get('id_only'):
             return
@@ -122,7 +107,6 @@ class ProcessList():
         }
 
     def process_row(self, counter=0):
-        start   = time.time()
 
         if not self.process_node.process_list:
             ## just sending a message to the terminal to let the user that the script is still working, and isn't stuck.
@@ -133,15 +117,14 @@ class ProcessList():
         if self.config.get('kill'):
             kills = self.murdah()
             if kills:
-                user_where_str = ' AND '.join(USER_WHERE)
                 print(op.cv(op.get_now_date() + " :: " + self.process_node.hostname +
-                        " :: Killed: " + str(kills) + " (WHERE {0})".format(user_where_str), op.Fore.RED + op.Style.BRIGHT))
+                        " :: Killed: " + str(kills) + " (SQL CRITERIA: {0})".format(self.process_node.sql), op.Fore.RED + op.Style.BRIGHT))
             return
 
         if not self.config.get('id_only'):
             self.print_header()
 
-        _nums               = self.__munch_values()
+        _nums = self.__munch_values()
 
         if self.config.get('id_only'):
             ## then we're done here.
@@ -166,9 +149,9 @@ class ProcessList():
 
         ## format the number of queries past the long query time
         if num_past_long_query > 0:
-            num_past_long_query = op.cv(num_past_long_query, Fore.RED)
+            num_past_long_query = op.cv(num_past_long_query, op.Fore.RED)
         else:
-            num_past_long_query = op.cv(num_past_long_query, Fore.CYAN)
+            num_past_long_query = op.cv(num_past_long_query, op.Fore.CYAN)
 
         ## format the number of sleepers
         if self.process_node.num_sleepers >= SLEEPER_THRESHOLD_CRIT:
@@ -194,7 +177,7 @@ class ProcessList():
         print("\t({0}) {1}".format(op.cv("Users", op.Fore.GREEN), user_str))
         print("\t({0}) {1}".format(op.cv("States", op.Fore.GREEN), state_str))
 
-        show_processing_time(start, time.time())
+        print(op.show_processing_time(self.start_time, time.time()))
 
         print()
 

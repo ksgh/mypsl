@@ -8,8 +8,6 @@ import subprocess
 import outputter as op
 import exceptions as Gen2Exception
 
-MYPSL_CONFIGS   = os.path.join(os.environ.get('HOME'), '.mypsl')
-
 
 def find_my_cnf():
     locations = (
@@ -54,7 +52,7 @@ class mydb():
     cursor          = None
     connect_args    = {}
 
-    def __init__(self, margs):
+    def __init__(self, margs, debug=False):
 
         self.connect_args = {
             'db':           'information_schema',
@@ -66,6 +64,7 @@ class mydb():
             'passwd':       margs.get('passwd', '')
         }
 
+        self.debug = debug
 
         if self.connect_args['host'] == 'localhost':
             socket = get_mysql_default('socket')
@@ -95,6 +94,10 @@ class mydb():
 
         except (AttributeError, pymysql.OperationalError):
             self.connect()
+
+            if self.debug == True:
+                print('pymysql exception, retrying...')
+
             self.query(sql, args)
 
         if self.cursor:

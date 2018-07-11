@@ -106,12 +106,13 @@ class Node(threading.Thread):
 class ProcessNode(Node):
 
     def __init__(self, thread_lock, db, sql):
+        self.thread_lock = thread_lock
+        self.blocking = True
+        self.sql = sql
+        self.process_list = {}
+        self.num_processes = 0
+
         super(ProcessNode, self).__init__(db)
-        self.thread_lock    = thread_lock
-        self.blocking       = True
-        self.sql            = sql
-        self.process_list   = {}
-        self.num_processes  = 0
 
 
     def update(self):
@@ -131,6 +132,7 @@ class ProcessNode(Node):
     def __get_process_list(self):
         cur = self.db.query(self.sql)
         res = cur.fetchall()
+
         self.num_processes = cur.rowcount
         return res
 

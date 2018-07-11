@@ -27,7 +27,6 @@ import argparse
 import time
 
 from gen2.mysqldriver import mydb
-from gen2.processlist import show_processing_time
 from gen2.processlist import ProcessList
 from gen2.processnode import ProcessNode
 import gen2.connections as connections
@@ -47,9 +46,6 @@ SLEEPER_THRESHOLD_WARN  = 30
 SLEEPER_THRESHOLD_CRIT  = 75
 INFO_TRIM_LENGTH        = 1000
 
-USER_WHERE      = []
-HOSTNAME        = None
-OUT_FORMAT      = "{0:<12}{1:16}{2:20}{3:22}{4:25}{5:<8}{6:28}{7:25}"
 
 '''
 The following directory should contain files that should be in yaml format
@@ -141,7 +137,6 @@ def parse_args():
     return parser.parse_args()
 
 def compile_sql(args):
-    global USER_WHERE
     where = []
     order_by = []
     where_str = ''
@@ -166,10 +161,10 @@ def compile_sql(args):
     if not args.id_only:
         select_fields.extend(['user', 'host', 'db', 'command', 'time', 'state', 'info'])
 
-    sql = "SELECT SQL_NO_CACHE {0} FROM processlist".format(', '.join(select_fields))
+    sql = "SELECT {0} FROM processlist".format(', '.join(select_fields))
 
     if args.default:
-        # where.append("(command = 'Query' OR command = 'Connect')")
+        where.append("(command = 'Query' OR command = 'Connect')")
         where.append("(command != 'Sleep')")
         args.loop_second_interval = 3
         args.ignore_system_user = True
@@ -188,7 +183,6 @@ def compile_sql(args):
             where.append("info LIKE '{0}%'".format(args.query))
         if args.order_by:
             order_by.append(args.order_by)
-        USER_WHERE = list(where)
 
     if args.kill and not where:
         print(op.cv("ERROR: Cannot kill without specifying criteria!", op.Fore.RED + op.Style.BRIGHT))
@@ -209,7 +203,7 @@ def compile_sql(args):
     sql = ' '.join([sql, where_str, order_by_str])
 
     if args.debug:
-        show_processing_time(PROG_START, time.time(), 'Program Preparation')
+        op.show_processing_time(PROG_START, time.time(), 'Program Preparation')
         print("SQL: {0}".format(op.cv(sql, op.Fore.CYAN)))
 
     return sql
@@ -222,6 +216,7 @@ def __shutdown(db):
             db.db_close()
         except Exception as e:
             print(op.cv(str(e), op.Fore.RED + op.Style.BRIGHT))
+    print('Quitting...')
     print()
     sys.exit(0)
 
@@ -230,7 +225,6 @@ def main():
     args = parse_args()
 
     db_auth = connections.prep_db_connection_data(MYPSL_CONFIGS, args)
-
     db = mydb(db_auth)
 
     if args.debug:
@@ -247,17 +241,22 @@ def main():
 
     sql = compile_sql(args)
     pn = ProcessNode(threading.Lock(), db, sql)
-    pl = ProcessList(pn, args)
+    pl = ProcessList(pn, vars(args))
 
-    try:
-        while True:
-            pl.print_header()
-            pl.process_row()
-            pl.update()
+    if args.loop_second_interval > 0:
+        counter = 0
+        try:
+            while True:
+                counter += 1
+                if pl.process_row():
+                    counter = 0
+                time.sleep(args.loop_second_interval)
+                pl.update(time.time())
 
-            time.sleep(args.loop_second_interval)
-    except KeyboardInterrupt:
-        __shutdown(db)
+        except KeyboardInterrupt:
+            __shutdown(db)
+    else:
+        pl.process_row()
 
 
 if __name__ == '__main__':

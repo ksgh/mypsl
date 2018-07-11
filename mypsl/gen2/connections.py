@@ -55,6 +55,7 @@ def __load_from_salt(args, pillar_key='mysql:connection'):
 '''
 def prep_db_connection_data(config_dir, args):
     salt_connection = None
+
     db_connection = {
         'host': args.host,
         'passwd': args.passwd,
@@ -64,6 +65,7 @@ def prep_db_connection_data(config_dir, args):
         'salt_minion': args.salt_minion,
         'connect_type': 'default'
     }
+
     if args.connect_config:
         db_connection.update(__load_from_config(config_dir, args, db_connection))
         db_connection['connect_type'] = 'config'
