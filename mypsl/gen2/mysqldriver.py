@@ -106,6 +106,11 @@ class mydb():
         return False
 
 
+    def close(self):
+        self.cursor_close()
+        self.db_close()
+
+
     def cursor_close(self):
         if self.cursor:
             self.cursor.close()

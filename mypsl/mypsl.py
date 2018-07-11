@@ -204,8 +204,13 @@ def compile_sql(args):
     return sql
 
 
-def __shutdown(db):
-    if db:
+def __shutdown(node_thread):
+    try:
+        node_thread.join()
+    except RuntimeError:
+        pass
+    if node_thread.db:
+        db = node_thread.db
         try:
             db.cursor_close()
             db.db_close()
@@ -216,14 +221,13 @@ def __shutdown(db):
     sys.exit(0)
 
 
-def main():
-    args = parse_args()
-
+def establish_node(args, sql, threaded=False):
     db_auth = connections.prep_db_connection_data(MYPSL_CONFIGS, args)
     db = mydb(db_auth)
+    db.connect()
 
     if args.debug:
-        if db:
+        if db.conn:
             print(op.cv(
                 ' --> db connection ({0}) established'.format(db_auth['connect_type']),
                 op.Fore.GREEN + op.Style.BRIGHT
@@ -234,24 +238,43 @@ def main():
                 op.Fore.RED + op.Style.BRIGHT
             ))
 
-    sql = compile_sql(args)
     pn = ProcessNode(threading.Lock(), db, sql)
-    pl = ProcessList(pn, vars(args))
+    if threaded == True:
+        pn.start()
 
-    if args.loop_second_interval > 0:
+    return pn
+
+
+def display_process_lists(pl, loop_interval):
+    if loop_interval > 0:
         counter = 0
-        try:
-            while True:
-                counter += 1
-                if pl.process_row(counter):
-                    counter = 0
-                time.sleep(args.loop_second_interval)
-                pl.update(time.time())
+        while True:
+            counter += 1
+            if pl.process_row(counter):
+                counter = 0
 
-        except KeyboardInterrupt:
-            __shutdown(db)
+            time.sleep(loop_interval)
+            pl.update(time.time())
     else:
         pl.process_row()
+
+
+def main():
+    args = parse_args()
+    sql = compile_sql(args)
+
+    processNode = establish_node(args, sql)
+    pl = ProcessList(processNode, vars(args))
+
+    try:
+        display_process_lists(pl, args.loop_second_interval)
+    except KeyboardInterrupt:
+        __shutdown(processNode)
+
+    try:
+        processNode.join()
+    except RuntimeError:
+        pass
 
 
 if __name__ == '__main__':

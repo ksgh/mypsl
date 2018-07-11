@@ -105,10 +105,11 @@ class Node(threading.Thread):
 
 class ProcessNode(Node):
 
-    def __init__(self, thread_lock, db, sql):
+    def __init__(self, thread_lock, db, sql, sleep_time=2):
         self.thread_lock = thread_lock
-        self.blocking = True
+        self.blocking = False
         self.sql = sql
+        self.sleep_time = sleep_time
         self.process_list = {}
         self.num_processes = 0
 
@@ -123,11 +124,10 @@ class ProcessNode(Node):
 
 
     def run(self):
-        sleep = 5
-
+        self.thread_lock.acquire(self.blocking)
         while True:
             self.update()
-            time.sleep(sleep)
+            time.sleep(self.sleep_time)
 
 
     def __get_process_list(self):
