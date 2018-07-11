@@ -25,12 +25,12 @@ import threading
 import sys
 import argparse
 import time
-import signal
 
 from gen2.mysqldriver import mydb
 from gen2.processlist import show_processing_time
 from gen2.processlist import ProcessList
 from gen2.processnode import ProcessNode
+import gen2.connections as connections
 import gen2.outputter as op
 
 PROG_START = time.time()
@@ -50,6 +50,14 @@ INFO_TRIM_LENGTH        = 1000
 USER_WHERE      = []
 HOSTNAME        = None
 OUT_FORMAT      = "{0:<12}{1:16}{2:20}{3:22}{4:25}{5:<8}{6:28}{7:25}"
+
+'''
+The following directory should contain files that should be in yaml format
+host: stuff.example.com
+user: kshenk
+passwd: things
+port: 3306
+'''
 MYPSL_CONFIGS   = os.path.join(os.environ.get('HOME'), '.mypsl')
 
 def _get_config_files(prefix, parsed_args, **kwargs):
@@ -193,12 +201,12 @@ def compile_sql(args):
         where.append("user != 'system user'")
 
     if where:
-        where_str = ' WHERE {0}'.format(' AND '.join(where))
+        where_str = 'WHERE {0}'.format(' AND '.join(where))
 
     if order_by:
-        order_by_str = ' ORDER BY {0}'.format(', '.join(order_by))
+        order_by_str = 'ORDER BY {0}'.format(', '.join(order_by))
 
-    sql = ''.join([sql, where_str, order_by_str])
+    sql = ' '.join([sql, where_str, order_by_str])
 
     if args.debug:
         show_processing_time(PROG_START, time.time(), 'Program Preparation')
@@ -207,42 +215,49 @@ def compile_sql(args):
     return sql
 
 
+def __shutdown(db):
+    if db:
+        try:
+            db.cursor_close()
+            db.db_close()
+        except Exception as e:
+            print(op.cv(str(e), op.Fore.RED + op.Style.BRIGHT))
+    print()
+    sys.exit(0)
+
+
 def main():
     args = parse_args()
 
-    db_connection = {
-        'host': args.host,
-        'passwd': args.passwd,
-        'port': args.port,
-        'user': args.user,
-        'charset': args.charset,
-        'salt_minion': args.salt_minion
-    }
+    db_auth = connections.prep_db_connection_data(MYPSL_CONFIGS, args)
 
-    db = mydb(db_connection)
+    db = mydb(db_auth)
 
-    def sig_handler(signal, frame):
+    if args.debug:
         if db:
-            try:
-                db.cursor_close()
-                db.db_close()
-            except Exception as e:
-                print(op.cv(str(e), op.Fore.RED + op.Style.BRIGHT))
-        print()
-        sys.exit(0)
-
-    signal.signal(signal.SIGINT, sig_handler)
+            print(op.cv(
+                ' --> db connection ({0}) established'.format(db_auth['connect_type']),
+                op.Fore.GREEN + op.Style.BRIGHT
+            ))
+        else:
+            print(op.cv(
+                ' --> db connection ({0}) failed'.format(db_auth['connect_type']),
+                op.Fore.RED + op.Style.BRIGHT
+            ))
 
     sql = compile_sql(args)
     pn = ProcessNode(threading.Lock(), db, sql)
     pl = ProcessList(pn, args)
 
-    while True:
-        pl.print_header()
-        pl.process_row()
-        pl.update()
+    try:
+        while True:
+            pl.print_header()
+            pl.process_row()
+            pl.update()
 
-        time.sleep(args.loop_second_interval)
+            time.sleep(args.loop_second_interval)
+    except KeyboardInterrupt:
+        __shutdown(db)
 
 
 if __name__ == '__main__':

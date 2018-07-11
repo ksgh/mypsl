@@ -56,9 +56,6 @@ class mydb():
 
     def __init__(self, margs):
 
-        self.margs = margs
-
-        ## default everything, and override as necessary.
         self.connect_args = {
             'db':           'information_schema',
             'charset':      margs.get('charset', 'utf-8'),
@@ -69,16 +66,13 @@ class mydb():
             'passwd':       margs.get('passwd', '')
         }
 
-        if margs.get('salt_minion'):
-            if not self.__load_from_salt():
-                sys.exit(1)
-        else:
-            if self.margs.get('host') == 'localhost':
-                socket = get_mysql_default('socket')
-                if socket:
-                    self.connect_args['unix_socket'] = socket
-                    del self.connect_args['host']
-                    del self.connect_args['port']
+
+        if self.connect_args['host'] == 'localhost':
+            socket = get_mysql_default('socket')
+            if socket:
+                self.connect_args['unix_socket'] = socket
+                del self.connect_args['host']
+                del self.connect_args['port']
 
         pymysql.paramstyle = 'pyformat'
 
@@ -108,37 +102,6 @@ class mydb():
 
         return False
 
-
-    def __load_from_salt(self):
-        try:
-            import salt.client
-        except ImportError:
-            raise Gen2Exception.SaltConfigError('Unable to import salt.client')
-
-        lc = salt.client.LocalClient()
-
-        data = lc.cmd(self.margs.get('salt_minion'), 'network.ip_addrs')
-
-        if not data:
-            raise Gen2Exception.SaltClientError('Error: Unable to get the IP address via network.ip_addrs')
-
-        try:
-            self.connect_args['host'] = data[self.margs.get('salt_minion')][0]
-        except (KeyError, IndexError, TypeError):
-            raise Gen2Exception.SaltClientError("Error: Unable to get the IP address.")
-
-        data = lc.cmd(self.margs.get('salt_minion'), 'pillar.get', ['mysql:connection'])
-
-        if not data:
-            raise Gen2Exception.SaltClientError("Error: Unable to get mysql:connection from pillar.")
-
-        try:
-            self.connect_args['user']   = data[self.margs.get('salt_minion')]['user']
-            self.connect_args['passwd'] = data[self.margs.get('salt_minion')]['pass']
-        except KeyError:
-            raise Gen2Exception.SaltClientError("Error: Unable to get 'user' or 'pass' from pillar data.")
-
-        return True
 
     def cursor_close(self):
         if self.cursor:

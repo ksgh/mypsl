@@ -18,7 +18,6 @@ setup(
         'colorama',
         'argparse',
         'argcomplete',
-        'pyyaml',
         'pymysql'
     ],
     zip_safe=False,
