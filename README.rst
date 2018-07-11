@@ -4,7 +4,7 @@ mypsl
 **Maintainer:** k dot shenk at gmail dot com
 
 The aim of **mypsl** is to provide a simple interface for querying and filtering the MySQL process list. Over time
-the available options have become bloated, so some cases may not be _so simple_.
+the available options have become bloated, so some cases may not be *so simple*.
 
 Installation
 ------------
