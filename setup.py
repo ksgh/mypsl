@@ -4,9 +4,14 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
+def get_version():
+    version_file = 'mypsl/mypsllibs/_version.py'
+    exec (open(version_file).read())
+    return __version__
+
 setup(
     name='mypsl',
-    version='0.2',
+    version=get_version(),
     description='Whittling down the MySQL process list',
     long_description=readme(),
     url='https://github.com/ksgh/mypsl',
@@ -23,7 +28,7 @@ setup(
     zip_safe=False,
 
     entry_points={
-        'console_scripts': ['mypsl=mypsl:main'],
+        'console_scripts': ['mypsl=mypsl.cli:main'],
     },
     classifiers={
         'Development Status :: 3 - Alpha',

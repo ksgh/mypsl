@@ -26,11 +26,11 @@ import sys
 import argparse
 import time
 
-from gen2.mysqldriver import mydb
-from gen2.processlist import ProcessList
-from gen2.processnode import ProcessNode
-import gen2.connections as connections
-import gen2.outputter as op
+from mypsllibs.mysqldriver import mydb
+from mypsllibs.processlist import ProcessList
+from mypsllibs.processnode import ProcessNode
+import mypsllibs.connections as connections
+import mypsllibs.outputter as op
 
 PROG_START = time.time()
 
@@ -60,7 +60,7 @@ def _get_config_files(prefix, parsed_args, **kwargs):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description=op.cv('MySQL Process list watcher & query killer.', op.Fore.CYAN + op.Style.BRIGHT),
+    parser = argparse.ArgumentParser(description=op.cv('(mypsl: {0}) :: MySQL Process list watcher & query killer.'.format(display_version()), op.Fore.CYAN + op.Style.BRIGHT),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     con_opt_group   = parser.add_argument_group(op.cv('Connection Options', op.Fore.YELLOW + op.Style.BRIGHT))
@@ -112,6 +112,8 @@ def parse_args():
         help='Order the results by a particular column: "user", "db asc", "db desc", "time desc"...etc')
     config_group.add_argument('-T', '--trim_info', dest='trim_info', action='store_true',
         help='Trim the info field (the query) to {0}'.format(INFO_TRIM_LENGTH))
+    config_group.add_argument('-v', '--version', dest='version', action='store_true',
+                              help='Show the installed program version and quit.')
 
     ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -251,7 +253,7 @@ def display_process_lists(pl, loop_interval):
         counter = 0
         while True:
             counter += 1
-            if pl.process_row(counter):
+            if pl.process_processes(counter):
                 counter = 0
 
             time.sleep(loop_interval)
@@ -260,8 +262,18 @@ def display_process_lists(pl, loop_interval):
         pl.process_row()
 
 
+def display_version():
+    from mypsllibs._version import __version__
+    print('mypsl: {}'.format(__version__))
+
+
 def main():
     args = parse_args()
+
+    if args.version:
+        display_version()
+        sys.exit(0)
+
     sql = compile_sql(args)
 
     processNode = establish_node(args, sql)
