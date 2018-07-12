@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 def readme():
     with open('README.rst') as f:
@@ -18,7 +18,7 @@ setup(
     author='Kyle Shenk',
     author_email='k.shenk@gmail.com',
     license='MIT',
-    packages=['mypsl'],
+    packages=find_packages(),
     install_requires=[
         'colorama',
         'argparse',
