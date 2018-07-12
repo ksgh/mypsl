@@ -60,7 +60,7 @@ def _get_config_files(prefix, parsed_args, **kwargs):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description=op.cv('MySQL Process list watcher & query killer.', op.Fore.CYAN + op.Style.BRIGHT),
+    parser = argparse.ArgumentParser(description=op.cv('(mypsl: {0}) :: MySQL Process list watcher & query killer.'.format(display_version()), op.Fore.CYAN + op.Style.BRIGHT),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     con_opt_group   = parser.add_argument_group(op.cv('Connection Options', op.Fore.YELLOW + op.Style.BRIGHT))
@@ -264,7 +264,7 @@ def display_process_lists(pl, loop_interval):
 
 def display_version():
     from mypsllibs._version import __version__
-    print('mypsl {}'.format(__version__))
+    print('mypsl: {}'.format(__version__))
 
 
 def main():

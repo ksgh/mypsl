@@ -4,14 +4,14 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
-def version():
+def get_version():
     version_file = 'mypsl/mypsllibs/_version.py'
     exec (open(version_file).read())
     return __version__
 
 setup(
     name='mypsl',
-    version=version(),
+    version=get_version(),
     description='Whittling down the MySQL process list',
     long_description=readme(),
     url='https://github.com/ksgh/mypsl',
