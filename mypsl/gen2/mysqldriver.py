@@ -1,7 +1,6 @@
 
 from distutils.spawn import find_executable
 import pymysql
-import sys
 import os
 import subprocess
 
