@@ -112,6 +112,8 @@ def parse_args():
         help='Order the results by a particular column: "user", "db asc", "db desc", "time desc"...etc')
     config_group.add_argument('-T', '--trim_info', dest='trim_info', action='store_true',
         help='Trim the info field (the query) to {0}'.format(INFO_TRIM_LENGTH))
+    config_group.add_argument('--version', dest='version', action='store_true',
+                              help='Show the installed program version and quit.')
 
     ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -260,8 +262,17 @@ def display_process_lists(pl, loop_interval):
         pl.process_row()
 
 
+def display_version():
+    from lib._version import __version__
+    print('mypsl {}'.format(__version__))
+
 def main():
     args = parse_args()
+
+    if args.version:
+        display_version()
+        sys.exit(0)
+
     sql = compile_sql(args)
 
     processNode = establish_node(args, sql)

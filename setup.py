@@ -1,12 +1,17 @@
 from setuptools import setup
+import os
 
 def readme():
     with open('README.rst') as f:
         return f.read()
 
 def version():
-    with open('VERSION.txt') as f:
-        return f.read()
+    version_file = 'mypsl/lib/_version.py'
+    if os.path.isfile(version_file):
+        exec (open(version_file).read())
+        return __version__
+    else:
+        return 'unknown'
 
 setup(
     name='mypsl',
