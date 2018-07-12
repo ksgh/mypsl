@@ -22,7 +22,16 @@ setup(
     ],
     zip_safe=False,
 
-    entry_points = {
+    entry_points={
         'console_scripts': ['mypsl=mypsl.mypsl:main'],
+    },
+    classifiers={
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Build Tools',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7'
     }
 )

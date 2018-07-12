@@ -216,7 +216,8 @@ def __shutdown(node_thread):
             db.db_close()
         except Exception as e:
             print(op.cv(str(e), op.Fore.RED + op.Style.BRIGHT))
-    print('Quitting...')
+
+    print(op.cv('Quitting...', op.Fore.CYAN + op.Style.BRIGHT))
     print()
     sys.exit(0)
 
