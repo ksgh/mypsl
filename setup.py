@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
 
     entry_points={
-        'console_scripts': ['mypsl=mypsl:main'],
+        'console_scripts': ['mypsl=mypsl.mypsl:main'],
     },
     classifiers={
         'Development Status :: 3 - Alpha',
