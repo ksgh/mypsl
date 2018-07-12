@@ -48,7 +48,7 @@ class ProcessList():
               "{0}".format(op.Style.RESET_ALL))
 
 
-    def __munch_values(self):
+    def __process_row(self):
         num_reads = num_writes = num_locked = num_closing = num_opening = num_past_long_query = 0
 
         user_count          = defaultdict(int)
@@ -106,7 +106,7 @@ class ProcessList():
             'state_count':          state_count
         }
 
-    def process_row(self, counter=0):
+    def process_processes(self, counter=0):
 
         if not self.process_node.process_list:
             ## just sending a message to the terminal to let the user that the script is still working, and isn't stuck.
@@ -124,7 +124,7 @@ class ProcessList():
         if not self.config.get('id_only'):
             self.print_header()
 
-        _nums = self.__munch_values()
+        _nums = self.__process_row()
 
         if self.config.get('id_only'):
             ## then we're done here.

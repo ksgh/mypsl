@@ -26,11 +26,11 @@ import sys
 import argparse
 import time
 
-from gen2.mysqldriver import mydb
-from gen2.processlist import ProcessList
-from gen2.processnode import ProcessNode
-import gen2.connections as connections
-import gen2.outputter as op
+from lib.mysqldriver import mydb
+from lib.processlist import ProcessList
+from lib.processnode import ProcessNode
+import lib.connections as connections
+import lib.outputter as op
 
 PROG_START = time.time()
 
@@ -251,7 +251,7 @@ def display_process_lists(pl, loop_interval):
         counter = 0
         while True:
             counter += 1
-            if pl.process_row(counter):
+            if pl.process_processes(counter):
                 counter = 0
 
             time.sleep(loop_interval)

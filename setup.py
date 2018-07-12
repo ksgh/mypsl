@@ -4,9 +4,13 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
+def version():
+    with open('VERSION.txt') as f:
+        return f.read()
+
 setup(
     name='mypsl',
-    version='0.2',
+    version=version(),
     description='Whittling down the MySQL process list',
     long_description=readme(),
     url='https://github.com/ksgh/mypsl',
