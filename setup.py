@@ -1,12 +1,21 @@
 from setuptools import setup
+import os
 
 def readme():
     with open('README.rst') as f:
         return f.read()
 
+def version():
+    version_file = 'mypsl/lib/_version.py'
+    if os.path.isfile(version_file):
+        exec (open(version_file).read())
+        return __version__
+    else:
+        return 'unknown'
+
 setup(
     name='mypsl',
-    version='0.2',
+    version=version(),
     description='Whittling down the MySQL process list',
     long_description=readme(),
     url='https://github.com/ksgh/mypsl',
