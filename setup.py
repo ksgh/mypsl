@@ -6,7 +6,7 @@ def readme():
 
 setup(
     name='mypsl',
-    version='0.1',
+    version='0.2',
     description='Whittling down the MySQL process list',
     long_description=readme(),
     url='https://github.com/ksgh/mypsl',
@@ -23,7 +23,7 @@ setup(
     zip_safe=False,
 
     entry_points={
-        'console_scripts': ['mypsl=mypsl.mypsl:main'],
+        'console_scripts': ['mypsl=mypsl:main'],
     },
     classifiers={
         'Development Status :: 3 - Alpha',
