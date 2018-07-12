@@ -112,7 +112,7 @@ def parse_args():
         help='Order the results by a particular column: "user", "db asc", "db desc", "time desc"...etc')
     config_group.add_argument('-T', '--trim_info', dest='trim_info', action='store_true',
         help='Trim the info field (the query) to {0}'.format(INFO_TRIM_LENGTH))
-    config_group.add_argument('--version', dest='version', action='store_true',
+    config_group.add_argument('-v', '--version', dest='version', action='store_true',
                               help='Show the installed program version and quit.')
 
     ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

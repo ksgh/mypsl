@@ -1,5 +1,4 @@
 from setuptools import setup
-import os
 
 def readme():
     with open('README.rst') as f:
@@ -7,11 +6,8 @@ def readme():
 
 def version():
     version_file = 'mypsl/mypsllibs/_version.py'
-    if os.path.isfile(version_file):
-        exec (open(version_file).read())
-        return __version__
-    else:
-        return 'unknown'
+    exec (open(version_file).read())
+    return __version__
 
 setup(
     name='mypsl',
