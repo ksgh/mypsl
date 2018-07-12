@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 def version():
-    version_file = 'mypsl/lib/_version.py'
+    version_file = 'mypsl/mypsllibs/_version.py'
     if os.path.isfile(version_file):
         exec (open(version_file).read())
         return __version__

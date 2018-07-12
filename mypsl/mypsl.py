@@ -26,11 +26,11 @@ import sys
 import argparse
 import time
 
-from lib.mysqldriver import mydb
-from lib.processlist import ProcessList
-from lib.processnode import ProcessNode
-import lib.connections as connections
-import lib.outputter as op
+from mypsllibs.mysqldriver import mydb
+from mypsllibs.processlist import ProcessList
+from mypsllibs.processnode import ProcessNode
+import mypsllibs.connections as connections
+import mypsllibs.outputter as op
 
 PROG_START = time.time()
 
@@ -263,7 +263,7 @@ def display_process_lists(pl, loop_interval):
 
 
 def display_version():
-    from lib._version import __version__
+    from mypsllibs._version import __version__
     print('mypsl {}'.format(__version__))
 
 def main():
