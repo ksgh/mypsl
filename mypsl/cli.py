@@ -266,6 +266,7 @@ def display_version():
     from mypsllibs._version import __version__
     print('mypsl {}'.format(__version__))
 
+
 def main():
     args = parse_args()
 
