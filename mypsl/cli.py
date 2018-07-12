@@ -26,11 +26,11 @@ import sys
 import argparse
 import time
 
-from mypsllibs.mysqldriver import mydb
-from mypsllibs.processlist import ProcessList
-from mypsllibs.processnode import ProcessNode
-import mypsllibs.connections as connections
-import mypsllibs.outputter as op
+from mypsl.mypsllibs.mysqldriver import mydb
+from mypsl.mypsllibs.processlist import ProcessList
+from mypsl.mypsllibs.processnode import ProcessNode
+import mypsl.mypsllibs.connections as connections
+import mypsl.mypsllibs.outputter as op
 
 PROG_START = time.time()
 
