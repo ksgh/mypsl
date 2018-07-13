@@ -3,20 +3,27 @@
 
 '''
     mypsl :: MySQL process list watcher and query killer
-    Copyright (C) 2018 Kyle Shenk <k.shenk@gmail.com>
+    MIT License
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    Copyright (c) 2018 Kyle Shenk
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 '''
 
 from __future__ import print_function
@@ -26,11 +33,11 @@ import sys
 import argparse
 import time
 
-from mypsllibs.mysqldriver import mydb
-from mypsllibs.processlist import ProcessList
-from mypsllibs.processnode import ProcessNode
-import mypsllibs.connections as connections
-import mypsllibs.outputter as op
+from libs.mysqldriver import mydb
+from libs.processlist import ProcessList
+from libs.processnode import ProcessNode
+import libs.connections as connections
+import libs.outputter as op
 
 PROG_START = time.time()
 
@@ -263,7 +270,7 @@ def display_process_lists(pl, loop_interval):
 
 
 def get_version():
-    from mypsllibs._version import __version__
+    from libs._version import __version__
     return 'mypsl: {}'.format(__version__)
 
 
