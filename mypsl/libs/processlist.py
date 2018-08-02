@@ -179,7 +179,7 @@ class ProcessList():
 
         print(op.show_processing_time(self.start_time, time.time()))
 
-        print
+        print('')
 
         return True
 
@@ -200,8 +200,6 @@ class ProcessList():
                 return
 
     def murdah(self):
-        # neutered... for now.
-        return
         ## ok. is it an integer and are the connected threads greater than the kill threshold ?
         try:
             kill_threshold = int(self.config.get('kill_threshold'))
@@ -222,7 +220,9 @@ class ProcessList():
             if not self.config.get('kill_all'):
                 if not row['info'].lower().startswith('select'):
                     continue
-            if self.process_node.db.query(sql, (row['id'],)):
+            if (1 == 1):
+            #if self.process_node.db.query(sql, (row['id'],)):
+                print("WOULD HAVE KILLED: {}".format(row))
                 self.record_kill(row)
                 killed += 1
         return killed
