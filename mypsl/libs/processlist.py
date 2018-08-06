@@ -196,7 +196,7 @@ class ProcessList():
                     f.write(kill_string)
 
             except IOError:
-                print(op.cv("Unable to write to: {0}".format(self.config['kill_log'], op.Fore.RED + op.Style.BRIGHT)))
+                print(op.cv("Unable to write to: {0}".format(self.config['kill_log']), op.Fore.RED + op.Style.BRIGHT))
                 return
 
     def murdah(self):
@@ -220,9 +220,9 @@ class ProcessList():
             if not self.config.get('kill_all'):
                 if not row['info'].lower().startswith('select'):
                     continue
-            if (1 == 1):
-            #if self.process_node.db.query(sql, (row['id'],)):
-                print("WOULD HAVE KILLED: {}".format(row))
+            #if (1 == 1):
+            if self.process_node.db.query(sql, (row['id'],)):
+                #print("WOULD HAVE KILLED: {}".format(row))
                 self.record_kill(row)
                 killed += 1
         return killed

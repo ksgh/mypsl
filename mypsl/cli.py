@@ -284,6 +284,7 @@ def main():
     sql = compile_sql(args)
 
     processNode = establish_node(args, sql)
+    processNode.update()
     pl = ProcessList(processNode, vars(args))
 
     try:
