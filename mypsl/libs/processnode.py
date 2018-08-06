@@ -136,6 +136,6 @@ class ProcessNode(Node):
 
             self.num_processes = cur.rowcount
             return res
-        except AttributeError as e:
+        except AttributeError:
             return None
 

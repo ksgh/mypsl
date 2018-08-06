@@ -220,9 +220,7 @@ class ProcessList():
             if not self.config.get('kill_all'):
                 if not row['info'].lower().startswith('select'):
                     continue
-            #if (1 == 1):
             if self.process_node.db.query(sql, (row['id'],)):
-                #print("WOULD HAVE KILLED: {}".format(row))
                 self.record_kill(row)
                 killed += 1
         return killed
