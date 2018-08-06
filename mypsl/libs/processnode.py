@@ -130,9 +130,12 @@ class ProcessNode(Node):
 
 
     def __get_process_list(self):
-        cur = self.db.query(self.sql)
-        res = cur.fetchall()
+        try:
+            cur = self.db.query(self.sql)
+            res = cur.fetchall()
 
-        self.num_processes = cur.rowcount
-        return res
+            self.num_processes = cur.rowcount
+            return res
+        except AttributeError:
+            return None
 

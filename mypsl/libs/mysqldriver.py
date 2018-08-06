@@ -5,7 +5,7 @@ import os
 import subprocess
 
 import outputter as op
-import exceptions as Gen2Exception
+from .exceptions import MyDBError
 
 
 def find_my_cnf():
@@ -55,7 +55,7 @@ class mydb():
 
         self.connect_args = {
             'db':           'information_schema',
-            'charset':      margs.get('charset', 'utf-8'),
+            'charset':      margs.get('charset', 'utf8'),
             'cursorclass':  pymysql.cursors.DictCursor,
             'host':         margs.get('host', 'localhost'),
             'port':         margs.get('port', 3306),
@@ -78,7 +78,7 @@ class mydb():
         try:
             self.conn = pymysql.connect(**self.connect_args)
         except pymysql.Error as e:
-            raise Gen2Exception.MyDBError("Unable to connect. MySQL Said: {0}: {1}".format(e.args[0],e.args[1]))
+            raise MyDBError("Unable to connect. MySQL Said: {0}: {1}".format(e.args[0],e.args[1]))
 
 
     def query(self, sql, args=[]):
