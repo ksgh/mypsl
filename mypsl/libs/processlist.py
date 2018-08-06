@@ -179,7 +179,7 @@ class ProcessList():
 
         print(op.show_processing_time(self.start_time, time.time()))
 
-        print
+        print('')
 
         return True
 
@@ -196,12 +196,10 @@ class ProcessList():
                     f.write(kill_string)
 
             except IOError:
-                print(op.cv("Unable to write to: {0}".format(self.config['kill_log'], op.Fore.RED + op.Style.BRIGHT)))
+                print(op.cv("Unable to write to: {0}".format(self.config['kill_log']), op.Fore.RED + op.Style.BRIGHT))
                 return
 
     def murdah(self):
-        # neutered... for now.
-        return
         ## ok. is it an integer and are the connected threads greater than the kill threshold ?
         try:
             kill_threshold = int(self.config.get('kill_threshold'))

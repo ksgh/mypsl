@@ -152,7 +152,7 @@ def compile_sql(args):
         sys.exit(1)
 
     if args.kill and args.default:
-        print(op.cv("ERROR: Cannot kill using defaults!", op.Fore.RED + op.Style.BRIGHT))
+        print(op.cv("ERROR: whoooaaaa no no no. You cannot kill using defaults!", op.Fore.RED + op.Style.BRIGHT))
         sys.exit(1)
 
     if args.kill:
@@ -284,6 +284,7 @@ def main():
     sql = compile_sql(args)
 
     processNode = establish_node(args, sql)
+    processNode.update()
     pl = ProcessList(processNode, vars(args))
 
     try:
