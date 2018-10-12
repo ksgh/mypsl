@@ -50,7 +50,7 @@ except ImportError:
 INFO_TRIM_LENGTH        = 1000
 
 '''
-The following directory should contain files that should be in yaml format
+The following directory should contain files that are in yaml format
 host: stuff.example.com
 user: kshenk
 passwd: things
@@ -135,6 +135,8 @@ def parse_args():
         help="If this is provided we won't stop to ask if you are sure that you want to kill queries.")
     kill_group.add_argument('-kl', '--kill_log', dest='kill_log', default='/var/log/killed_queries.log',
         help="Where to log killed queries to, granting permissions to write to this file.")
+    kill_group.add_argument('-klo', '--kill_log_only', dest='kill_log_only', action='store_true',
+        help="Only log the queries that would be killed, do not actually kill them")
 
     if HAS_ARGCOMPLETE:
         argcomplete.autocomplete(parser)
@@ -283,8 +285,7 @@ def main():
 
     sql = compile_sql(args)
 
-    processNode = establish_node(args, sql)
-    processNode.update()
+    processNode = establish_node(args, sql).update()
     pl = ProcessList(processNode, vars(args))
 
     try:
