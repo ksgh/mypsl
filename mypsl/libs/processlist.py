@@ -47,8 +47,7 @@ class ProcessList():
               op.OUT_FORMAT.format("ID", "USER", "HOST", "DB", "COMMAND", "TIME", "STATE", "INFO") +
               "{0}".format(op.Style.RESET_ALL))
 
-
-    def __process_row(self):
+    def process_row(self):
         num_reads = num_writes = num_locked = num_closing = num_opening = num_past_long_query = 0
 
         user_count          = defaultdict(int)
@@ -106,6 +105,7 @@ class ProcessList():
             'state_count':          state_count
         }
 
+
     def process_processes(self, counter=0):
 
         if not self.process_node.process_list:
@@ -124,7 +124,7 @@ class ProcessList():
         if not self.config.get('id_only'):
             self.print_header()
 
-        _nums = self.__process_row()
+        _nums = self.process_row()
 
         if self.config.get('id_only'):
             ## then we're done here.
@@ -183,21 +183,22 @@ class ProcessList():
 
         return True
 
+
     def record_kill(self, row):
         if os.path.exists(self.config.get('kill_log')):
             if not os.access(self.config.get('kill_log'), os.W_OK):
                 return
-        else:
-            try:
-                with open(self.config['kill_log'], 'a') as f:
-                    kill_string = "{0} :: {1} :: {2}\n".format(op.get_now_date(), self.process_node.hostname,
-                                                               ', '.join(
-                                                                   "%s: %s" % (k, v) for (k, v) in row.items()))
-                    f.write(kill_string)
+        try:
+            with open(self.config['kill_log'], 'a') as f:
+                kill_string = "{0} :: {1} :: {2}\n".format(op.get_now_date(), self.process_node.hostname,
+                                                           ', '.join(
+                                                               "%s: %s" % (k, v) for (k, v) in row.items()))
+                f.write(kill_string)
 
-            except IOError:
-                print(op.cv("Unable to write to: {0}".format(self.config['kill_log']), op.Fore.RED + op.Style.BRIGHT))
-                return
+        except IOError:
+            print(op.cv("Unable to write to: {0}".format(self.config['kill_log']), op.Fore.RED + op.Style.BRIGHT))
+            return
+
 
     def murdah(self):
         ## ok. is it an integer and are the connected threads greater than the kill threshold ?
@@ -220,7 +221,11 @@ class ProcessList():
             if not self.config.get('kill_all'):
                 if not row['info'].lower().startswith('select'):
                     continue
-            if self.process_node.db.query(sql, (row['id'],)):
+
+            if self.config.get('kill_log_only'):
+                self.record_kill(row)
+            elif self.process_node.db.query(sql, (row['id'],)):
                 self.record_kill(row)
                 killed += 1
+
         return killed
