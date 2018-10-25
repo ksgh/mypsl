@@ -61,20 +61,16 @@ def prep_db_connection_data(config_dir, args):
         'passwd': args.passwd,
         'port': args.port,
         'user': args.user,
-        'charset': args.charset,
-        'salt_minion': args.salt_minion,
-        'connect_type': 'default'
+        'charset': args.get('charset', 'utf8')
     }
 
     if args.connect_config:
         db_connection.update(__load_from_config(config_dir, args, db_connection))
-        db_connection['connect_type'] = 'config'
 
     if args.salt_minion:
         salt_connection = __load_from_salt(args)
 
     if salt_connection:
         db_connection = salt_connection
-        db_connection['connect_type'] = 'salt'
 
     return db_connection

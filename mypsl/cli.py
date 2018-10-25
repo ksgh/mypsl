@@ -97,6 +97,8 @@ def parse_args():
 
     config_group.add_argument('-l', '--loop', dest='loop_second_interval', type=int, default=0,
         help='Time in seconds between getting the process list.')
+    config_group.add_argument('-lm', '--loop_max', dest='loop_max', type=int, default=None,
+        help='If specified we will stop execution when the loop interval reaches this number')
     config_group.add_argument('-dft', '--default', dest='default', action='store_true',
         help='Run with defaults. Loop interval: 3 seconds, command like query or connect, order by time asc, id asc, truncate query to {0}.'.format(INFO_TRIM_LENGTH))
     config_group.add_argument('-c', '--command', dest='command', type=str,
@@ -241,12 +243,12 @@ def establish_node(args, sql, threaded=False):
     if args.debug:
         if db.conn:
             print(op.cv(
-                ' --> db connection ({0}) established'.format(db_auth['connect_type']),
+                ' --> db connection ({0}) established'.format(db_auth['host']),
                 op.Fore.GREEN + op.Style.BRIGHT
             ))
         else:
             print(op.cv(
-                ' --> db connection ({0}) failed'.format(db_auth['connect_type']),
+                ' --> db connection ({0}) failed'.format(db_auth['host']),
                 op.Fore.RED + op.Style.BRIGHT
             ))
 
@@ -257,10 +259,24 @@ def establish_node(args, sql, threaded=False):
     return pn
 
 
-def display_process_lists(pl, loop_interval):
+def __loop_control(counter, max):
+    if max is None or isinstance(max, str):
+        return True
+
+    if max > 0:
+        if counter < max:
+            return True
+        else:
+            return False
+    else:
+        print(op.cv('The max loop interval should be greater than 0...'))
+        sys.exit(1)
+
+
+def display_process_lists(pl, loop_interval, loop_max):
     if loop_interval > 0:
         counter = 0
-        while True:
+        while __loop_control(counter, loop_max):
             counter += 1
             if pl.process_processes(counter):
                 counter = 0
@@ -289,7 +305,7 @@ def main():
     pl = ProcessList(processNode, vars(args))
 
     try:
-        display_process_lists(pl, args.loop_second_interval)
+        display_process_lists(pl, args.loop_second_interval, args.loop_max)
     except KeyboardInterrupt:
         __shutdown(processNode)
 
@@ -297,6 +313,8 @@ def main():
         processNode.join()
     except RuntimeError:
         pass
+
+    sys.exit(0)
 
 
 if __name__ == '__main__':

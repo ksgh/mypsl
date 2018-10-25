@@ -46,24 +46,21 @@ def get_mysql_default(search_opt):
             return d.split('=')[1].strip()
     return None
 
+
 class mydb():
     conn            = None
     cursor          = None
     connect_args    = {}
 
     def __init__(self, margs, debug=False):
+        self.debug = debug
 
         self.connect_args = {
             'db':           'information_schema',
-            'charset':      margs.get('charset', 'utf8'),
             'cursorclass':  pymysql.cursors.DictCursor,
-            'host':         margs.get('host', 'localhost'),
-            'port':         margs.get('port', 3306),
-            'user':         margs.get('user', ''),
-            'passwd':       margs.get('passwd', '')
         }
 
-        self.debug = debug
+        self.connect_args.update(margs)
 
         if self.connect_args['host'] == 'localhost':
             socket = get_mysql_default('socket')
@@ -73,6 +70,7 @@ class mydb():
                 del self.connect_args['port']
 
         pymysql.paramstyle = 'pyformat'
+
 
     def connect(self):
         try:
