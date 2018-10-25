@@ -61,7 +61,7 @@ def prep_db_connection_data(config_dir, args):
         'passwd': args.passwd,
         'port': args.port,
         'user': args.user,
-        'charset': args.get('charset', 'utf8')
+        'charset': args.charset
     }
 
     if args.connect_config:
