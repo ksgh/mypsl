@@ -1,5 +1,7 @@
 
 from collections import defaultdict
+from .notification import Notification
+from .exceptions import NotificationError
 import os
 import time
 import outputter as op
@@ -185,6 +187,21 @@ class ProcessList():
 
 
     def record_kill(self, row):
+
+        if self.config.get('notify_slack'):
+            proxies = {
+                'http': 'http://proxy.svcs:3128',
+                'https': 'http://proxy.svcs:3128'
+            }
+            msg = 'Query Killed on {hostname}'.format(hostname=row['host'])
+
+            # No need to bail if we just can't send the slack notification
+            try:
+                notifier = Notification(row, proxies)
+                notifier.send(msg, ':jason:')
+            except NotificationError as e:
+                print(e)
+
         if os.path.exists(self.config.get('kill_log')):
             if not os.access(self.config.get('kill_log'), os.W_OK):
                 return
