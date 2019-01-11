@@ -14,3 +14,6 @@ class SaltClientError(Error):
 
 class TooManyInstancesError(Error):
     pass
+
+class NotificationError(Error):
+    pass
