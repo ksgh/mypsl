@@ -1,7 +1,7 @@
 
 import os
 import ConfigParser
-from datetime import datetime
+import time
 from slackclient import SlackClient
 from .exceptions import NotificationError
 
@@ -60,11 +60,9 @@ class Notification():
 
         attachments = [{
             'color':    '#E42217',
-            'title':    msg,
-            'fallback': msg,
             'fields':   fields,
             'footer':   'mypsl query killah',
-            'ts':       datetime.now().timestamp()
+            'ts':       time.time()
         }]
 
         for channel in channels:
@@ -72,6 +70,7 @@ class Notification():
                 'chat.postMessage',
                 channel=channel,
                 username=self.slack_config.get('username'),
+                text=msg,
                 icon_emoji=icon,
                 attachments=attachments
             )
