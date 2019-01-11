@@ -23,7 +23,8 @@ setup(
         'colorama',
         'argparse',
         'argcomplete',
-        'pymysql'
+        'pymysql',
+        'slackclient'
     ],
     zip_safe=False,
 
