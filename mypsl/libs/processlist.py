@@ -193,7 +193,7 @@ class ProcessList():
                 'http': 'http://proxy.svcs:3128',
                 'https': 'http://proxy.svcs:3128'
             }
-            msg = 'Query Killed on {hostname}'.format(hostname=row['host'])
+            msg = '*Query Killed on `{hostname}`*'.format(hostname=self.process_node.hostname)
 
             # No need to bail if we just can't send the slack notification
             try:
