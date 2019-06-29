@@ -4,7 +4,7 @@ import pymysql
 import os
 import subprocess
 
-import outputter as op
+from . import outputter as op
 from .exceptions import MyDBError
 
 

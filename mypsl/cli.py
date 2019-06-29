@@ -26,18 +26,18 @@
     SOFTWARE.
 '''
 
-from __future__ import print_function
+
 import os
 import threading
 import sys
 import argparse
 import time
 
-from libs.mysqldriver import mydb
-from libs.processlist import ProcessList
-from libs.processnode import ProcessNode
-import libs.connections as connections
-import libs.outputter as op
+from .libs.mysqldriver import mydb
+from .libs.processlist import ProcessList
+from .libs.processnode import ProcessNode
+from . import libs.connections as connections
+from . import libs.outputter as op
 
 PROG_START = time.time()
 
@@ -163,7 +163,7 @@ def compile_sql(args):
 
     if args.kill:
         if not args.kill_yes:
-            ans = raw_input(op.cv("Are you sure you want to kill queries? ", op.Style.BRIGHT))
+            ans = input(op.cv("Are you sure you want to kill queries? ", op.Style.BRIGHT))
             if ans.lower() not in ('y', 'yes'):
                 print("Ok, then only use --kill when you are sure you want to kill stuff.")
                 sys.exit(0)
@@ -290,7 +290,7 @@ def display_process_lists(pl, loop_interval, loop_max):
 
 
 def get_version():
-    from libs._version import __version__
+    from .libs._version import __version__
     return 'mypsl: {}'.format(__version__)
 
 

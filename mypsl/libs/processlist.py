@@ -4,7 +4,7 @@ from .notification import Notification
 from .exceptions import NotificationError
 import os
 import time
-import outputter as op
+from . import outputter as op
 
 READ_SEARCH     = ('show', 'select', 'desc')
 WRITE_SEARCH    = ('insert', 'update', 'create', 'alter', 'replace', 'rename', 'delete')
@@ -209,7 +209,7 @@ class ProcessList():
             with open(self.config['kill_log'], 'a') as f:
                 kill_string = "{0} :: {1} :: {2}\n".format(op.get_now_date(), self.process_node.hostname,
                                                            ', '.join(
-                                                               "%s: %s" % (k, v) for (k, v) in row.items()))
+                                                               "%s: %s" % (k, v) for (k, v) in list(row.items())))
                 f.write(kill_string)
 
         except IOError:

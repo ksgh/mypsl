@@ -1,6 +1,6 @@
 
 import os
-import ConfigParser
+import configparser
 import time
 from slackclient import SlackClient
 from .exceptions import NotificationError
@@ -35,7 +35,7 @@ class Notification():
         self.slack_client = self.__get_client()
 
     def __get_client(self):
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.read(self.slack_auth_file)
 
         self.slack_config = {
@@ -51,7 +51,7 @@ class Notification():
         channels    = self.slack_config.get('channels')
         fields      = []
 
-        for key, val in self.query_data.items():
+        for key, val in list(self.query_data.items()):
             fields.append({
                 'title': key,
                 'value': val,
