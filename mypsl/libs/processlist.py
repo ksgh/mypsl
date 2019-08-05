@@ -193,13 +193,16 @@ class ProcessList():
                 'http': 'http://proxy.svcs:3128',
                 'https': 'http://proxy.svcs:3128'
             }
-            msg = '*Query Killed on `{hostname}`*'.format(hostname=self.process_node.hostname)
+            msg = 'Query Killed on {hostname}'.format(hostname=self.process_node.hostname)
 
             # No need to bail if we just can't send the slack notification
             try:
-                notifier = Notification(row, proxies)
-                notifier.send(msg, ':jason:')
-            except NotificationError as e:
+                # Notification configuration is handled in the service definition
+                notifier = Notification(proxies)
+                # When sending an email notification, currently the 3rd argument (icon) doesn't have any affect
+                notifier.send(msg, row, {'icon': ':jason:'})
+            except Exception as e:
+                # Anything that may have happened in there doesn't have to stop the show
                 print(e)
 
         if os.path.exists(self.config.get('kill_log')):
