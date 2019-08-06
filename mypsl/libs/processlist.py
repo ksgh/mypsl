@@ -188,7 +188,7 @@ class ProcessList():
 
     def record_kill(self, row):
 
-        if self.config.get('notify_slack'):
+        if self.config.get('send_notification'):
             proxies = {
                 'http': 'http://proxy.svcs:3128',
                 'https': 'http://proxy.svcs:3128'

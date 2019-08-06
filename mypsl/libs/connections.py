@@ -7,7 +7,7 @@ def __load_from_config(config_dir, args, connect_dict):
     cfile = os.path.join(config_dir, args.connect_config)
     if os.path.isfile(cfile):
         with open(cfile, 'r') as f:
-            connect_dict.update(yaml.load(f))
+            connect_dict.update(yaml.load(f, Loader=yaml.FullLoader))
             return connect_dict
 
     return {}
