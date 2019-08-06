@@ -4,6 +4,7 @@ import ConfigParser
 import time
 import smtplib
 import subprocess
+import json
 from email.mime.text import MIMEText
 from slackclient import SlackClient
 from .exceptions import NotificationError
@@ -56,7 +57,7 @@ class Notification(object):
                 self.send_slack_msg(msg_long, msg_short, kwargs)
 
             if self.notification_type == 'emailhack':
-                pass
+                self.send_email_hack(msg_short, msg_long)
 
         except NotificationError:
             # let any raised NotificationError's bubbled up pass thru.
@@ -71,7 +72,12 @@ class Notification(object):
         relay = os.getenv('NOTIFICATION_HOST', None)
         port = os.getenv('NOTIFICATION_PORT', None)
 
-        cmd = [EXTERNAL_SENDMAIL, relay, port, from_addr, to_addr, subject, body]
+        try:
+            body = json.dumps(body, indent=2)
+        except TypeError:
+            pass
+
+        cmd = [EXTERNAL_SENDMAIL, relay, port, from_addr, to_addr, '"{s}"'.format(s=subject), "'{b}'".format(b=body)]
 
         proc = subprocess.Popen(' '.join(cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         proc.wait()
