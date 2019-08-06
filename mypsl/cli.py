@@ -123,7 +123,7 @@ def parse_args():
         help='Trim the info field (the query) to {0}'.format(INFO_TRIM_LENGTH))
     config_group.add_argument('-v', '--version', dest='version', action='store_true',
                               help='Show the installed program version and quit.')
-    config_group.add_argument('--slack', dest='notify_slack', action='store_true',
+    config_group.add_argument('--send-notification', dest='send_notification', action='store_true',
         help='Send a notification to slack anytime we kill a query. Slack Auth/Config file must exist @ ~/.slack_auth')
 
     ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

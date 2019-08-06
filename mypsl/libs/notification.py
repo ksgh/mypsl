@@ -3,6 +3,8 @@ import os
 import ConfigParser
 import time
 import smtplib
+import subprocess
+import json
 from email.mime.text import MIMEText
 from slackclient import SlackClient
 from .exceptions import NotificationError
@@ -11,7 +13,11 @@ import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
 
-SUPPORTED_NOTIFICATION_TYPES = ('email', 'slack')
+# email hack sends subject (1) and body (2) to an external script in order to get around
+# oddities when inside a container that would otherwise require us to setup/configure postfix/ssmtp etc...
+SUPPORTED_NOTIFICATION_TYPES = ('email', 'emailhack', 'slack')
+
+EXTERNAL_SENDMAIL = '/sendmail.sh'
 
 '''
 NOTE: There can be more than one slack channel. They must be separated by a comma.
@@ -22,6 +28,7 @@ username: jazzcibot
 token: theSuperSecretToken
 channels: #tech-jazzbot-noise,#second-optional-channelname
 '''
+
 
 class Notification(object):
 
@@ -49,10 +56,40 @@ class Notification(object):
             if self.notification_type == 'slack':
                 self.send_slack_msg(msg_long, msg_short, kwargs)
 
+            if self.notification_type == 'emailhack':
+                self.send_email_hack(msg_short, msg_long)
+
         except NotificationError:
             # let any raised NotificationError's bubbled up pass thru.
             # This means that if we blow a TypeError, or KeyError (etc) we'll have to catch that higher up
             pass
+
+
+    def send_email_hack(self, subject, body):
+
+        from_addr = os.getenv('NOTIFICATION_FROM', None)
+        to_addr = os.getenv('NOTIFICATION_TO', None)
+        relay = os.getenv('NOTIFICATION_HOST', None)
+        port = os.getenv('NOTIFICATION_PORT', None)
+
+        try:
+            body = json.dumps(body, indent=2)
+        except TypeError:
+            pass
+
+        cmd = [EXTERNAL_SENDMAIL, relay, port, from_addr, to_addr, '"{s}"'.format(s=subject), "'{b}'".format(b=body)]
+
+        proc = subprocess.Popen(' '.join(cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        proc.wait()
+
+        for line in proc.stdout.readlines():
+            print(line)
+
+        if proc.returncode != 0:
+            return False
+
+        return True
+
 
     def send_email(self, subject, body):
         from_addr = os.getenv('NOTIFICATION_FROM', None)
@@ -95,7 +132,7 @@ class Notification(object):
 
         return SlackClient(self.slack_config.get('token'), proxies=self.proxies)
 
-    def send_slack_msg(self, query_data, msg='', kwargs):
+    def send_slack_msg(self, query_data, msg, kwargs={}):
 
         slack_auth_file = os.path.join(os.path.expanduser('~'), '.slack_auth')
 
