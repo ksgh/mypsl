@@ -23,6 +23,7 @@ token: theSuperSecretToken
 channels: #tech-jazzbot-noise,#second-optional-channelname
 '''
 
+
 class Notification(object):
 
     def __init__(self, proxies = None):
@@ -95,7 +96,7 @@ class Notification(object):
 
         return SlackClient(self.slack_config.get('token'), proxies=self.proxies)
 
-    def send_slack_msg(self, query_data, msg='', kwargs):
+    def send_slack_msg(self, query_data, msg, kwargs={}):
 
         slack_auth_file = os.path.join(os.path.expanduser('~'), '.slack_auth')
 
