@@ -59,10 +59,9 @@ class Notification(object):
             if self.notification_type == 'emailhack':
                 self.send_email_hack(msg_short, msg_long)
 
-        except NotificationError:
+        except NotificationError as e:
             # let any raised NotificationError's bubbled up pass thru.
-            # This means that if we blow a TypeError, or KeyError (etc) we'll have to catch that higher up
-            pass
+            print(e)
 
 
     def send_email_hack(self, subject, body):
@@ -79,7 +78,17 @@ class Notification(object):
 
         cmd = [EXTERNAL_SENDMAIL, relay, port, from_addr, to_addr, '"{s}"'.format(s=subject), "'{b}'".format(b=body)]
 
-        proc = subprocess.Popen(' '.join(cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        # noisey, but could save time if something is amiss
+        print("THE FOLLOWING IS THE NOTIFICATION COMMAND SENT TO THE SHELL SCRIPT")
+        print(' '.join(cmd))
+
+        proc = subprocess.Popen(
+            ' '.join(cmd),
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            executable='/bin/bash'
+        )
         proc.wait()
 
         for line in proc.stdout.readlines():
